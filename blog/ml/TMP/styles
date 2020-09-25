@@ -1,0 +1,7 @@
+article a4paper, 11pt,
+comment 
+lipsum 
+fullpage 
+inputenc utf8
+hyperref 
+graphicx 

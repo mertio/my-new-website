@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Implementation of a Neural Network from Scratch and Applying it in Solving Problems</title>
+	<meta charset="UTF-8">
+	<meta name="description" content="In this article, we look at 2 different applications of a neural network to solve specific problems. One being the classification of tumors with a given data-set consisting of 21 features and 3 possible categories, the other being a handwritten digit recognizor trained with the MNIST Handwritten Digit Database">
+
+	<link rel="stylesheet" type="text/css" href="../../MyStyles.css">
+	
+	
+	
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-132957653-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-132957653-1');
+</script>
+
+	
+	
+</head>
+<body>
+
+
+
+		<img src="../../mebubiLogo.png" align="left">
+
+			<br><br><br>
+		<ul id="navUL">
+			<div id="divToRight">
+			<li id="navLI"><a id="navLink" href="../../contact.html"><b>Contact</b></a></li>
+			</div>
+			<div id="divToRight">
+			<li id="navLI"><a id="navLink" href="../../blog.html"><b>Blog</b></a></li>	
+			</div>
+			<div id="divToRight">
+			<li id="navLI"><a id="navLink" href="../../projects.html"><b>Projects</b></a></li>
+			</div>
+			<div id="divToRight">
+			<li id="navLI"><a id="navLink" href="../../index.html"><b>About Me</b></a></li>
+			</div>
+
+
+		</ul>
+
+	<hr id="seperatingLine" align="center">
+
+
+	<br>
+
+	<center>
+		<div id="textBody" style="font-family: Arial; text-align: left;">
+			
+	
+
+
+<P>
+<H1 ALIGN=CENTER>Implementation of a Neural Network from Scratch and Applying it in Solving Problems
+<BR>
+</H1>
+<P ALIGN=CENTER><STRONG>Mert Bugra Bicak</STRONG><br>
+<SPAN  CLASS="textit">Department of Computer Engineering</SPAN>
+<BR><I><SPAN  CLASS="textit">Akdeniz University</SPAN></I>
+<BR><FONT SIZE=-1>Antalya, Turkey</FONT>
+</P>
+<HR>
+
+ For this task, I used pure Java and built a neural network that takes in a number of inputs(features used), number of hidden layers(can only take 1 or 2), number of units each hidden layer will possess, and the number of outputs. As the cost function, I have used the cross enthropy function as the loss function since it is the one that is most commonly used and we have observed it more carefully in class. As for the activation function, the sigmoid function was used in each layer. <BR>
+ I have not used any libraries in this project. I have written a small file consisting of the functions I have used to implement the network called MertsFunctions, such as matrix multiplication, addition, weight saving/loading, etc. Some small helper functions like for example loading the digit data from the file, were referenced from StackOverflow and the users that provided the code, either as a basis or as a whole function, have been referenced in the source code of the homework.
+
+<P>
+
+<H1><A NAME="SECTION00020000000000000000">
+Part 1: Building a Neural Network with 1 Hidden Layer to Help Classify Thyroids</A>
+</H1>
+
+<P>
+ For this problem I used the training set ("ann-train.data") and the test set ("ann-test.data") given.  The training set contains 3772 instances and the test set contains 3428 instances. There are a total of 3 classes. Each of the instances in these sets have 21 features, 15 of them binary and 6 of them continuous and 1 class label that consists of 3 possible values: 1,2, or 3. <BR>
+ I chose to include all 21 features but since some are continuous and some are binary, I used max-min normalization to normalize each input into a value in the range of -1 and 1.
+
+<H3><A NAME="SECTION00020100000000000000">
+The Class Distribution Problem</A>
+</H3>
+ The one big problem I ran into is the imbalance in the class distribution in both the training set and the testing set. Approximately 92% of each set consists of instances belonging to class 3. This completely biased the neural network towards class 3, resulting in it predicting class 3 for every instance no matter what the learning rate, number of hidden nodes, etc. was.
+
+<H3><A NAME="SECTION00020200000000000000">
+Tackling the Class Distribution Problem</A>
+</H3>
+ As a possible solution to this imbalance, I have used up-sampling, e.g. increased the number of each minority class by duplicating them a number of times. While balancing the inputs, I added each instance of class 1 for 4 times (372 instances of class 1 in total) and each instance of class 2 twice (382 instances of class 2 in total). I added the remaining instances from class 3 with the number of instances being close to the number of the instances of class 1 and 2 (394 instances of class 3 in total) and then shuffled them up. Also for every time the set is loaded, the input is shuffled as well. This helps each iteration be trained with different random instances of class 3 as opposed to down-sampling class 3 the first 387 instances.
+
+<P>
+
+<H2><A NAME="SECTION00021000000000000000">
+Training and Tesing with Different Numbers of Hidden Layer Nodes</A>
+</H2>
+ For each training, to tackle of the class distribution problem, I kept the epoch at 1 and reloaded the data for each iteration to freshen up the training data to include other instances of class 3 as mentioned in the previous section. As a reminder, every training session has been done with the balanced training set since the unbalance one is pretty much useless. I did 5000 iterations (converges to a nice number) for each number and used the learning rate of 0.01 as I found it to be the best through experience. Here are the results obtained from the training of 5 different numbers of hidden layer nodes: (N: Number of hidden layer nodes, <SPAN CLASS="MATH"><tex2html_image_mark>alpha</SPAN>: Learning rate) <BR>
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="LEFT">N=20, <SPAN CLASS="MATH"><tex2html_image_mark>alpha</SPAN>=0.01</TD>
+<TD ALIGN="LEFT">C1 acc.</TD>
+<TD ALIGN="LEFT">C2 acc.</TD>
+<TD ALIGN="LEFT">C3 acc.</TD>
+<TD ALIGN="LEFT">Gen. Acc.</TD>
+<TD ALIGN="LEFT">C1 inst.</TD>
+<TD ALIGN="LEFT">C2 inst.</TD>
+<TD ALIGN="LEFT">C3 inst.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Balanced Train Set</TD>
+<TD ALIGN="LEFT">92.47%</TD>
+<TD ALIGN="LEFT">54.18%</TD>
+<TD ALIGN="LEFT">67.95%</TD>
+<TD ALIGN="LEFT">71.34%</TD>
+<TD ALIGN="LEFT">372</TD>
+<TD ALIGN="LEFT">382</TD>
+<TD ALIGN="LEFT">394</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Unbalanced Train Set</TD>
+<TD ALIGN="LEFT">92.47%</TD>
+<TD ALIGN="LEFT">54.45%</TD>
+<TD ALIGN="LEFT">68.83%</TD>
+<TD ALIGN="LEFT">68.67%</TD>
+<TD ALIGN="LEFT">93</TD>
+<TD ALIGN="LEFT">191</TD>
+<TD ALIGN="LEFT">3488</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Test Set</TD>
+<TD ALIGN="LEFT">97.26%</TD>
+<TD ALIGN="LEFT">6.77%</TD>
+<TD ALIGN="LEFT">35.84%</TD>
+<TD ALIGN="LEFT">35.63%</TD>
+<TD ALIGN="LEFT">73</TD>
+<TD ALIGN="LEFT">177</TD>
+<TD ALIGN="LEFT">3178</TD>
+</TR>
+</TABLE>
+</DIV><BR>
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="LEFT">N=50, <SPAN CLASS="MATH"><tex2html_image_mark>alpha</SPAN>=0.01</TD>
+<TD ALIGN="LEFT">C1 acc.</TD>
+<TD ALIGN="LEFT">C2 acc.</TD>
+<TD ALIGN="LEFT">C3 acc.</TD>
+<TD ALIGN="LEFT">Gen. Acc.</TD>
+<TD ALIGN="LEFT">C1 inst.</TD>
+<TD ALIGN="LEFT">C2 inst.</TD>
+<TD ALIGN="LEFT">C3 inst.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Balanced Train Set</TD>
+<TD ALIGN="LEFT">90.32%</TD>
+<TD ALIGN="LEFT">58.90%</TD>
+<TD ALIGN="LEFT">74.87%</TD>
+<TD ALIGN="LEFT">74.56%</TD>
+<TD ALIGN="LEFT">372</TD>
+<TD ALIGN="LEFT">382</TD>
+<TD ALIGN="LEFT">394</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Unbalanced Train Set</TD>
+<TD ALIGN="LEFT">90.32%</TD>
+<TD ALIGN="LEFT">59.16%</TD>
+<TD ALIGN="LEFT">75.34%</TD>
+<TD ALIGN="LEFT">74.87%</TD>
+<TD ALIGN="LEFT">93</TD>
+<TD ALIGN="LEFT">191</TD>
+<TD ALIGN="LEFT">3488</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Test Set</TD>
+<TD ALIGN="LEFT">98.63%</TD>
+<TD ALIGN="LEFT">37.28%</TD>
+<TD ALIGN="LEFT">21.86%</TD>
+<TD ALIGN="LEFT">24.29%</TD>
+<TD ALIGN="LEFT">73</TD>
+<TD ALIGN="LEFT">177</TD>
+<TD ALIGN="LEFT">3178</TD>
+</TR>
+</TABLE>
+</DIV><BR>
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="LEFT">N=100, <SPAN CLASS="MATH"><tex2html_image_mark>alpha</SPAN>=0.01</TD>
+<TD ALIGN="LEFT">C1 acc.</TD>
+<TD ALIGN="LEFT">C2 acc.</TD>
+<TD ALIGN="LEFT">C3 acc.</TD>
+<TD ALIGN="LEFT">Gen. Acc.</TD>
+<TD ALIGN="LEFT">C1 inst.</TD>
+<TD ALIGN="LEFT">C2 inst.</TD>
+<TD ALIGN="LEFT">C3 inst.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Balanced Train Set</TD>
+<TD ALIGN="LEFT">94.62%</TD>
+<TD ALIGN="LEFT">54.97%</TD>
+<TD ALIGN="LEFT">74.60%</TD>
+<TD ALIGN="LEFT">73.21%</TD>
+<TD ALIGN="LEFT">372</TD>
+<TD ALIGN="LEFT">382</TD>
+<TD ALIGN="LEFT">394</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Unbalanced Train Set</TD>
+<TD ALIGN="LEFT">94.62%</TD>
+<TD ALIGN="LEFT">54.97%</TD>
+<TD ALIGN="LEFT">72.36%</TD>
+<TD ALIGN="LEFT">72.01%</TD>
+<TD ALIGN="LEFT">93</TD>
+<TD ALIGN="LEFT">191</TD>
+<TD ALIGN="LEFT">3488</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Test Set</TD>
+<TD ALIGN="LEFT">100%</TD>
+<TD ALIGN="LEFT">5.64%</TD>
+<TD ALIGN="LEFT">80.39%</TD>
+<TD ALIGN="LEFT">76.93%</TD>
+<TD ALIGN="LEFT">73</TD>
+<TD ALIGN="LEFT">177</TD>
+<TD ALIGN="LEFT">3178</TD>
+</TR>
+</TABLE>
+</DIV><BR>
+
+<P>
+
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="LEFT">N=200, <SPAN CLASS="MATH"><tex2html_image_mark>alpha</SPAN>=0.01</TD>
+<TD ALIGN="LEFT">C1 acc.</TD>
+<TD ALIGN="LEFT">C2 acc.</TD>
+<TD ALIGN="LEFT">C3 acc.</TD>
+<TD ALIGN="LEFT">Gen. Acc.</TD>
+<TD ALIGN="LEFT">C1 inst.</TD>
+<TD ALIGN="LEFT">C2 inst.</TD>
+<TD ALIGN="LEFT">C3 inst.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Balanced Train Set</TD>
+<TD ALIGN="LEFT">96.50%</TD>
+<TD ALIGN="LEFT">60.20%</TD>
+<TD ALIGN="LEFT">74.16%</TD>
+<TD ALIGN="LEFT">76.77%</TD>
+<TD ALIGN="LEFT">372</TD>
+<TD ALIGN="LEFT">382</TD>
+<TD ALIGN="LEFT">394</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Unbalanced Train Set</TD>
+<TD ALIGN="LEFT">96.77%</TD>
+<TD ALIGN="LEFT">60.20%</TD>
+<TD ALIGN="LEFT">74.94%</TD>
+<TD ALIGN="LEFT">74.71%</TD>
+<TD ALIGN="LEFT">93</TD>
+<TD ALIGN="LEFT">191</TD>
+<TD ALIGN="LEFT">3488</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Test Set</TD>
+<TD ALIGN="LEFT">72.60%</TD>
+<TD ALIGN="LEFT">44.63%</TD>
+<TD ALIGN="LEFT">77.34%</TD>
+<TD ALIGN="LEFT">75.53%</TD>
+<TD ALIGN="LEFT">73</TD>
+<TD ALIGN="LEFT">177</TD>
+<TD ALIGN="LEFT">3178</TD>
+</TR>
+</TABLE>
+</DIV><BR>
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="LEFT">N=400, <SPAN CLASS="MATH"><tex2html_image_mark>alpha</SPAN>=0.01</TD>
+<TD ALIGN="LEFT">C1 acc.</TD>
+<TD ALIGN="LEFT">C2 acc.</TD>
+<TD ALIGN="LEFT">C3 acc.</TD>
+<TD ALIGN="LEFT">Gen. Acc.</TD>
+<TD ALIGN="LEFT">C1 inst.</TD>
+<TD ALIGN="LEFT">C2 inst.</TD>
+<TD ALIGN="LEFT">C3 inst.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Balanced Train Set</TD>
+<TD ALIGN="LEFT">95.69%</TD>
+<TD ALIGN="LEFT">63.08%</TD>
+<TD ALIGN="LEFT">77.49%</TD>
+<TD ALIGN="LEFT">78.60%</TD>
+<TD ALIGN="LEFT">372</TD>
+<TD ALIGN="LEFT">382</TD>
+<TD ALIGN="LEFT">394</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Unbalanced Train Set</TD>
+<TD ALIGN="LEFT">95.69%</TD>
+<TD ALIGN="LEFT">63.35%</TD>
+<TD ALIGN="LEFT">76.00%</TD>
+<TD ALIGN="LEFT">75.82%</TD>
+<TD ALIGN="LEFT">93</TD>
+<TD ALIGN="LEFT">191</TD>
+<TD ALIGN="LEFT">3488</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Test Set</TD>
+<TD ALIGN="LEFT">72.60%</TD>
+<TD ALIGN="LEFT">99.43%</TD>
+<TD ALIGN="LEFT">9.21%</TD>
+<TD ALIGN="LEFT">15.22%</TD>
+<TD ALIGN="LEFT">73</TD>
+<TD ALIGN="LEFT">177</TD>
+<TD ALIGN="LEFT">3178</TD>
+</TR>
+</TABLE>
+</DIV><BR>
+
+<P>
+ The numbers I got from these trials are very interesting. The learning goes relatively well for the balanced training set and the unbalanced training set for every one of them. This is expected since it is tested on the data that it is trained with. The more interesting observations can be made on the accuracies of the test set. Depending on the numbers of hidden layer nodes(N), it is never the same two classes that get the highest class based accuracy. For example in N=50 and N=400, class 1 and 2 do better than 3. But when we look at N=200, we see what class 1 and 3 surpass 2. So we really can't say that one class dominates the others. Though it seems that the increased accuracy of two classes usually come at the cost of one. When we look at the higher percentages obtained, we can see that accuracy in C1 and C3 comes at the expense of the accuracy of C2 in N=100, and the accuracy of C1 and C2 comes at the expense of C3 in N=400. The more balanced set I obtained comes from N=200, which I will go forward with in further experimentation.
+
+<P>
+
+
+<P>
+
+<H2><A NAME="SECTION00022000000000000000">
+Normalized vs. Non-normalized</A>
+</H2>
+ With the same settings of the N=200 table in the previous section, I went through the exact same procedure this time without normalizing the data. Here are the 2 tables for us to compare: <BR><BR>
+ Normalized inputs:
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="LEFT">N=200, <SPAN CLASS="MATH"><tex2html_image_mark>alpha</SPAN>=0.01</TD>
+<TD ALIGN="LEFT">C1 acc.</TD>
+<TD ALIGN="LEFT">C2 acc.</TD>
+<TD ALIGN="LEFT">C3 acc.</TD>
+<TD ALIGN="LEFT">Gen. Acc.</TD>
+<TD ALIGN="LEFT">C1 inst.</TD>
+<TD ALIGN="LEFT">C2 inst.</TD>
+<TD ALIGN="LEFT">C3 inst.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Balanced Train Set</TD>
+<TD ALIGN="LEFT">96.50%</TD>
+<TD ALIGN="LEFT">60.20%</TD>
+<TD ALIGN="LEFT">74.16%</TD>
+<TD ALIGN="LEFT">76.77%</TD>
+<TD ALIGN="LEFT">372</TD>
+<TD ALIGN="LEFT">382</TD>
+<TD ALIGN="LEFT">394</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Unbalanced Train Set</TD>
+<TD ALIGN="LEFT">96.77%</TD>
+<TD ALIGN="LEFT">60.20%</TD>
+<TD ALIGN="LEFT">74.94%</TD>
+<TD ALIGN="LEFT">74.71%</TD>
+<TD ALIGN="LEFT">93</TD>
+<TD ALIGN="LEFT">191</TD>
+<TD ALIGN="LEFT">3488</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Test Set</TD>
+<TD ALIGN="LEFT">72.60%</TD>
+<TD ALIGN="LEFT">44.63%</TD>
+<TD ALIGN="LEFT">77.34%</TD>
+<TD ALIGN="LEFT">75.53%</TD>
+<TD ALIGN="LEFT">73</TD>
+<TD ALIGN="LEFT">177</TD>
+<TD ALIGN="LEFT">3178</TD>
+</TR>
+</TABLE>
+</DIV><BR>
+
+<P>
+Non-normalized inputs:
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="LEFT">N=200, <SPAN CLASS="MATH"><tex2html_image_mark>alpha</SPAN>=0.01</TD>
+<TD ALIGN="LEFT">C1 acc.</TD>
+<TD ALIGN="LEFT">C2 acc.</TD>
+<TD ALIGN="LEFT">C3 acc.</TD>
+<TD ALIGN="LEFT">Gen. Acc.</TD>
+<TD ALIGN="LEFT">C1 inst.</TD>
+<TD ALIGN="LEFT">C2 inst.</TD>
+<TD ALIGN="LEFT">C3 inst.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Balanced Train Set</TD>
+<TD ALIGN="LEFT">78.49%</TD>
+<TD ALIGN="LEFT">57.85%</TD>
+<TD ALIGN="LEFT">72.40%</TD>
+<TD ALIGN="LEFT">69.53%</TD>
+<TD ALIGN="LEFT">372</TD>
+<TD ALIGN="LEFT">382</TD>
+<TD ALIGN="LEFT">394</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Unbalanced Train Set</TD>
+<TD ALIGN="LEFT">78.48%</TD>
+<TD ALIGN="LEFT">58.11%</TD>
+<TD ALIGN="LEFT">74.25%</TD>
+<TD ALIGN="LEFT">73.52%</TD>
+<TD ALIGN="LEFT">93</TD>
+<TD ALIGN="LEFT">191</TD>
+<TD ALIGN="LEFT">3488</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Test Set</TD>
+<TD ALIGN="LEFT">67.12%</TD>
+<TD ALIGN="LEFT">57.62%</TD>
+<TD ALIGN="LEFT">74.88%</TD>
+<TD ALIGN="LEFT">73.81%</TD>
+<TD ALIGN="LEFT">73</TD>
+<TD ALIGN="LEFT">177</TD>
+<TD ALIGN="LEFT">3178</TD>
+</TR>
+</TABLE>
+</DIV><BR>
+
+<P>
+ When we compare the two results, we can see that in the balanced and unbalanced training set results, the class based accuracy in general took a hit and came out lower than the normalized version. Especially class 1, which went from around 96% to 78%. When it comes to the actual test set, we observe the almost the same situation with the only difference with class 2 increasing from 44% to 57%. Since we already observed, for 2 classes to grow in accuracy meant the decrease of the accuracy of the other class. We can see it occur here in reverse order. With the accuracy of classes 1 and 3 room opens for class 2 and it gets to increase its accuracy. <BR>
+ It must be said that since the inputs were all in the range of 0 and 1 to begin with, normalizing the inputs to the range of -1 to 1 did not make  an incredibly significant difference concerning the accuracy. So the results in the tables came out as expected. Since sigmoid functions were used for each layer, the overall increase of accuracy possibly came from converting the range of the input in to the exact range of input the sigmoid function has, which is from -1 to 1.
+
+<P>
+
+
+<P>
+
+<H1><A NAME="SECTION00030000000000000000">
+Part 2: Building a Neural Network with 2 Hidden Layers to Help Classify Hand-written Digits</A>
+</H1>
+ For this problem, my network takes in 784 inputs(number of pixels for each 28x28 image) and gives 10 outputs, each output being a vector of digit.(e.g. 1 = [0,1,0,0,0,0,0,0,0,0]) I have done training with 3 different styles and obtained varying results.
+
+<H2><A NAME="SECTION00031000000000000000">
+Style 1:</A>
+</H2>
+ The first style has 100 nodes for each hidden layer and has a high batch account with a low batch size, with the epoch number(number of times the back-propagation algorithm runs on a specific batch) of 50. A total of 55000 images were used to train this neural network. Below are some graphs. <BR>
+
+<P>
+<DIV ALIGN="CENTER">
+<IMG
+  WIDTH="600" HEIGHT="440" ALIGN="BOTTOM" BORDER="0"
+ SRC="./highBatchLoss.png"
+ ALT="Image highBatchLoss">
+
+</DIV>
+<DIV ALIGN="CENTER">
+<IMG
+  WIDTH="601" HEIGHT="454" ALIGN="BOTTOM" BORDER="0"
+ SRC="./highBatchAccuracy.png"
+ ALT="Image highBatchAccuracy">
+
+</DIV>
+<BR>
+
+<P>
+
+ The graphs show us the loss and the accuracy of each individual batch so the fluctuations shouldn't be miss-leading. Each batch consists of 500 seperate images and each training session gives a slightly different loss compared to the last one but nevertheless it slowly converges to a range between 0.3 and 0.6. The same can be said for accuracy. The accuracy on the graph is the accuracy for each individual batch and slowly converges to a range of 92 to 96%. This network scores 78.86% accuracy on 5000 test images. This was expected since the 92-96% range was achieved through testing with its own training data. 
+
+<H2><A NAME="SECTION00032000000000000000">
+Style 2:</A>
+</H2>
+ Next style I did involved involved 55 batches with each batch size being 1000, and the epoch being 150 for each batch. This time I used 200 nodes in the hidden layers and after a relatively longer training period from a test set of 5000 images, the same set as the first one, it managed to give 82.38% in accuracy. Almost 5% better than the first style. The learning path was very similar to the first and increasing the number of hidden nodes was probably helpful in the 5% increase in accuracy. Here are the graphs for the loss and accuracy of each batch. We can see the same fluctuations since the cost and accuracy is a bit different for each batch. But they still manage to converge to a nice number.
+
+<P>
+<DIV ALIGN="CENTER">
+<IMG
+  WIDTH="595" HEIGHT="442" ALIGN="BOTTOM" BORDER="0"
+ SRC="./lastLoss.png"
+ ALT="Image lastLoss">
+
+</DIV>
+
+<P>
+Here is an example of a prediction made by the algorithm: <BR><BR>
+Test number: 82, Prediction: 2.0, Reality: 2.0 <BR>
+[7.55E-5, 6.75E-5, 0.99, 3.20E-4, 2.95E-6, 7.15E-4, 5.61E-4, 5.80E-4, 5.21E-5, 1.30E-6] <BR>
+The number on the third index is extremely high compared to the others, so the the algorithm predicts 2. (the first index is zero)
+
+<P>
+<DIV ALIGN="CENTER">
+<IMG
+  WIDTH="598" HEIGHT="454" ALIGN="BOTTOM" BORDER="0"
+ SRC="./lastAccuracy.png"
+ ALT="Image lastAccuracy">
+
+</DIV>
+<BR>
+
+<P>
+
+<H2><A NAME="SECTION00033000000000000000">
+Style 3:</A>
+</H2>
+ As the third style, I decided to try a larger batch size and a lower number of epochs for comparison to the second run. The results weren't as good as the others. The reason was probably due to a low number of epochs. Each batch still individually converged in loss to a certain extent but the loss never dropped to the same amount as the first two and in the end it gave an accuracy of 67.83% on the test set with 5000 images.
+
+<H2><A NAME="SECTION00034000000000000000">
+Conclusion</A>
+</H2>
+ Below is a table that shows the details of each style for a better analysis. The best result was obtained by style 2, both because of the higher number of hidden nodes helping the algorithm find a better fitting curve for the data. The 5% lower accuracy from Style 1 seems like there wasn't enough hidden nodes compared to style 2 and the resulting curve couldn't be as complex as needed. Finally Style 3 suffered from the low number of epochs needed for each batch, it couldn't learn enough of each batch and moved on to the new one too early and resulted in a much lower accuracy than the others. 
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="LEFT"><SPAN CLASS="MATH"><tex2html_image_mark>#tex2html_wrap_inline109#</SPAN>=0.01</TD>
+<TD ALIGN="LEFT">Num. of hidden nodes</TD>
+<TD ALIGN="LEFT">epochs</TD>
+<TD ALIGN="LEFT">Batch size</TD>
+<TD ALIGN="LEFT">Batch num.</TD>
+<TD ALIGN="LEFT">Overall data</TD>
+<TD ALIGN="LEFT">Accuracy</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Style 1</TD>
+<TD ALIGN="LEFT">100</TD>
+<TD ALIGN="LEFT">100</TD>
+<TD ALIGN="LEFT">500</TD>
+<TD ALIGN="LEFT">110</TD>
+<TD ALIGN="LEFT">55000</TD>
+<TD ALIGN="LEFT">78.86%</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Style 2</TD>
+<TD ALIGN="LEFT">200</TD>
+<TD ALIGN="LEFT">150</TD>
+<TD ALIGN="LEFT">1000</TD>
+<TD ALIGN="LEFT">55</TD>
+<TD ALIGN="LEFT">55000</TD>
+<TD ALIGN="LEFT">82.38%</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Style 3</TD>
+<TD ALIGN="LEFT">200</TD>
+<TD ALIGN="LEFT">50</TD>
+<TD ALIGN="LEFT">5000</TD>
+<TD ALIGN="LEFT">11</TD>
+<TD ALIGN="LEFT">55000</TD>
+<TD ALIGN="LEFT">67.83%</TD>
+</TR>
+</TABLE>
+</DIV><BR>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		</div>
+	</center>
+
+
+</body>
+</html>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Securing a Java Desktop Application and its REST API written in Spring</title>
+	<meta charset="UTF-8">
+	<meta name="description" content="In this project, I made a JavaFX application with a Spring back-end, that didn't have any kind of previous security precautions before this, as secure as possible and ready for deployment. In this report, I will first give a brief introduction to the application itself and then discuss what sorts of precautions I took to make it more secure. We will see the details of these precautions, how they are able to be implemented in Spring and observe exactly what they are useful for security-wise. We will also discuss some remaining potential vulnerabilities and how to tackle them.">
+
+	
+	<link rel="stylesheet" type="text/css" href="../../MyStyles.css">
+	
+	
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-132957653-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-132957653-1');
+</script>
+
+	
+	
+</head>
+<body>
+
+
+
+		<img src="../../mebubiLogo.png" align="left">
+
+			<br><br><br>
+		<ul id="navUL">
+			<div id="divToRight">
+			<li id="navLI"><a id="navLink" href="../../contact.html"><b>Contact</b></a></li>
+			</div>
+			<div id="divToRight">
+			<li id="navLI"><a id="navLink" href="../../blog.html"><b>Blog</b></a></li>	
+			</div>
+			<div id="divToRight">
+			<li id="navLI"><a id="navLink" href="../../projects.html"><b>Projects</b></a></li>
+			</div>
+			<div id="divToRight">
+			<li id="navLI"><a id="navLink" href="../../index.html"><b>About Me</b></a></li>
+			</div>
+
+
+		</ul>
+
+	<hr id="seperatingLine" align="center">
+
+
+	<br>
+
+	<center>
+		<div id="textBody" style="font-family: Arial; text-align: left;">
+			
+	
+
+
+
+<P>
+<H1 ALIGN="CENTER">
+<BIG CLASS="LARGE">Securing a Java Desktop Application and its REST API written in Spring</BIG></H1>
+<DIV CLASS="author_info">
+
+<P ALIGN="CENTER"><STRONG>Mert Bugra Bicak</STRONG></P>
+<P ALIGN="CENTER"><STRONG>January 2019</STRONG></P>
+</DIV>
+
+<P>
+
+<P>
+<BR>
+
+<H2><A NAME="SECTION00010000000000000000">
+Download</A>
+</H2>
+<P>
+	The application is currently working without any problems and is deployed on an AWS server, so you can easily download it, create an account and start using it:<br>
+</P>
+<A href="http://www.mebubi.me/BreakItDown2.jar">Click here to download and start using Break It Down</ABBR>
+
+
+<H2><A NAME="SECTION00010000000000000000">
+Contents</A>
+</H2>
+<!--Table of Contents-->
+<UL CLASS="TofC">
+<LI><A NAME="tex2html21"
+  HREF="main.html#SECTION00030000000000000000">Introduction to the Application</A>
+<LI><A NAME="tex2html22"
+  HREF="main.html#SECTION00040000000000000000">Security Improvements</A>
+<LI><A NAME="tex2html23"
+  HREF="main.html#SECTION00050000000000000000">Conclusion</A>
+<LI><A NAME="tex2html24"
+  HREF="main.html#SECTION00060000000000000000">Helpful Resources</A>
+</UL>
+<!--End of Table of Contents-->
+<P>
+
+<P>
+
+<H1><A NAME="SECTION00020000000000000000">
+Abstract</A>
+</H1>
+
+<P>
+In this project, I made a JavaFX application with a Spring back-end, that didn't have any  kind of previous security precautions before this, as secure as possible and ready for deployment. In this report, I will first give a brief introduction to the application itself and then discuss what sorts of precautions I took to make it more secure. We will see the details of these precautions, how they are able to be implemented in Spring and observe exactly what they are useful for security-wise. We will also discuss some remaining potential vulnerabilities and how to tackle them.
+
+<P>
+
+<H1><A NAME="SECTION00030000000000000000">
+Introduction to the Application</A>
+</H1>
+ The application we will work on, named "Break-it-down", is essentially a to-do list application with the tasks that need to be done appearing as floating balls on a screen. Depending on the importance of the task, we can select bigger or smaller sizes for the ball. Each task can have sub-tasks(sub-balls) and by clicking on a task and clicking its "See children" button, we can go to the sub-layer of the said task and see its sub-tasks. It is a pretty simple app but it has helped me break things down into smaller tasks easier than before. And development-wise it is the first online app I have ever developed and was very good practice for learning JavaFX and Spring. In the end I hope to upload it onto a website for people to download and use. <BR>
+
+<P>
+
+<H2><A NAME="SECTION00031000000000000000">
+Front-end of the Application</A>
+</H2>
+ In the next few pages, we will look at some sample images of the application GUI and understand how it works. And then we will move on to the improvements made in security.
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="fig:fig1"></A><A NAME="28"></A>
+ <IMG width="70%"
+   ALIGN="BOTTOM" BORDER="0"
+ SRC="./login.png"
+ ALT="Image tokenLibrary">
+ <br><br>
+  <IMG width="70%"
+   ALIGN="BOTTOM" BORDER="0"
+ SRC="./createAccount.png"
+ ALT="Image tokenLibrary">
+
+<br>
+
+<CAPTION ALIGN="BOTTOM"><STRONG>Figures 1 and 2: </STRONG>
+The login and account creation pages</CAPTION>
+<br><br><br><br>
+
+</DIV>
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="fig:fig1"></A><A NAME="37"></A>
+
+
+ <IMG width="70%"
+   ALIGN="BOTTOM" BORDER="0"
+ SRC="./tasks.png"
+ ALT="Image tokenLibrary">
+ <br><br>
+  <IMG width="70%"
+   ALIGN="BOTTOM" BORDER="0"
+ SRC="./addTask.png"
+ ALT="Image tokenLibrary">
+
+<br>
+
+<CAPTION ALIGN="BOTTOM"><STRONG>Figures 3 and 4: </STRONG>
+The task page and the task adding window</CAPTION>
+
+<br><br><br><br>
+
+</DIV>
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="fig:fig1"></A><A NAME="46"></A>
+
+ <IMG width="70%"
+   ALIGN="BOTTOM" BORDER="0"
+ SRC="./task.png"
+ ALT="Image tokenLibrary">
+ <br><br>
+  <IMG width="70%"
+   ALIGN="BOTTOM" BORDER="0"
+ SRC="./subtasks.png"
+ ALT="Image tokenLibrary">
+
+<br>
+
+<CAPTION ALIGN="BOTTOM"><STRONG>Figures 5 and 6: </STRONG>
+We click "See Children" of task and end up on its sub-tasks</CAPTION>
+
+<br><br><br><br>
+
+</DIV>
+
+<P>
+
+<P>
+
+<H2><A NAME="SECTION00032000000000000000">
+Back-end of the Application</A>
+</H2>
+ The application's back-end is a REST API developed using Spring Boot. Before this project, no security precautions were implemented. Anybody could access the API with no authentication and the passwords of the users were plain-text. The security improvements were generally made in this layer of the application.
+
+<P>
+
+<H2><A NAME="SECTION00033000000000000000">
+Database</A>
+</H2>
+ The back-end communicates with a MySQL database using Hibernate, a framework for object-relational-mapping.
+
+<P>
+
+<H1><A NAME="SECTION00040000000000000000">
+Security Improvements</A>
+</H1>
+ After learning a little bit about the application we can now we move on to what kind of security improvements were implemented to make this application more secure. Two major improvements were made and we will individually analyze each
+of them.
+
+<H2><A NAME="SECTION00041000000000000000">
+Token System</A>
+</H2>
+ In the beginning of this project, the application's REST service was accessible to anyone who knew the IP address of the server it was hosted on. For example, you could easily get or change other users' data from the outside by changing the username parameter in the CRUD requests sent to the service. To tackle this problem, I used the Spring security framework to reject any requests to the service except for login and registration. <BR>
+When we create an account or login with our current account, the service will give us an access token that was generated specifically from our own username and an additional secret key. Every time our application sends a request to the service, it will now need to send to send the access token that it got and get authenticated by the server in order to get access. Otherwise it will get a 401 UNAUTHORIZED response from the server.
+
+<P>
+
+<P>
+
+<H3><A NAME="SECTION00041100000000000000">
+Generating the Token</A>
+</H3>
+ In order to generate the token, I used the methods below:
+
+<DIV ALIGN="CENTER">
+ <DIV ALIGN="CENTER">
+
+</DIV> <IMG
+  WIDTH="575" HEIGHT="732" ALIGN="BOTTOM" BORDER="0"
+ SRC="./tokenLibrary.png"
+ ALT="Image tokenLibrary">
+
+</DIV>
+
+<P>
+The generateToken(..) methods take either the Object of the user or the username directly and with the help of a secret key (which is not in the screenshot) it generates a token specific to the user. Currently the userId of the user and the username are the same so it basically uses the username twice to generate a token. Also in the registration and login process, we use this method to generate the token and give it to the client-side.
+<BR>
+
+<P>
+The parseToken(..) method basically just takes the token and returns the user it belongs to if any. This will help us identify who is making the request and respond accordingly, as we will see soon.
+
+<P>
+
+<P>
+
+<H3><A NAME="SECTION00041200000000000000">
+Using the Token</A>
+</H3>
+ Below we will see how the service authenticates the user by looking at a sample request handling method in the application. It gets the parentId(The id of the task whose children we'll get), the status of the tasks we want shown(done, undone or all), and of course the username whose data we try to access as parameters. We also need to send our token in a header tagged "Authorization" to get authenticated by the service. If the token sent corresponds to any user registered to this application, the request gets authenticated and the handler method starts. But now we need to check if the user authenticated with the token is trying to access his or her own data and not another user's. After all, if we register and get a token, we can try to manipulate other people's data with it since the token bypasses the security of the service. So we use the tokensMatch(..) method to check if the username in the parameter (the one whose data we're trying to access) is actually the same as the username of the token used when authenticating. If so, we return the necessary data. If not, we return an empty list and the user's data is not compromised. 
+
+<DIV ALIGN="CENTER">
+ <DIV ALIGN="CENTER">
+
+</DIV> <IMG
+  WIDTH="743" HEIGHT="354" ALIGN="BOTTOM" BORDER="0"
+ SRC="./tokenCheck.png"
+ ALT="Image tokenCheck">
+
+</DIV>
+<BR>
+And this is the method we use to compare the two tokens:
+
+<DIV ALIGN="CENTER">
+ <DIV ALIGN="CENTER">
+
+</DIV> <IMG
+  WIDTH="609" HEIGHT="252" ALIGN="BOTTOM" BORDER="0"
+ SRC="./tokenCheckMetohd.png"
+ ALT="Image tokenCheckMetohd">
+
+</DIV>
+
+<P>
+
+<P>
+
+<H2><A NAME="SECTION00042000000000000000">
+Storing Hashed Passwords with Salt</A>
+</H2>
+ Now we move on to another important security improvement made to the application. In the beginning, the passwords for each user were stored in the database as plain-text. Now, using a salted hash function called BCrypt, provided by the Spring Security framework, the passwords are stored as hashes. Salt is a string added to the plain-text before hashing to prevent rainbow table attacks on the passwords in the database. Below is the structure of the Bcrypt hash output that would be found in a database. As we can see, the salt is included adjacent to the hashed text and not hidden somewhere. Which seems counter-intuitive but doesn't make a difference in the security as long as it is unqiue for each user.
+
+<P>
+
+<DIV ALIGN="CENTER">
+ <DIV ALIGN="CENTER">
+
+</DIV> <IMG
+  WIDTH="338" HEIGHT="89" ALIGN="BOTTOM" BORDER="0"
+ SRC="./bcryptHash.png"
+ ALT="Image bcryptHash">
+
+</DIV>
+
+<P>
+Now let's look at how we implement this in the application. In the register method, while saving the newly registered user to the database, we use the passwordEncoder instance (of BCryptPasswordEncoder) to encode (hash) the password right before storing it. Therefore, we only have the hashed version of the password at hand. This is done in the method below:
+
+<P>
+
+<DIV ALIGN="CENTER">
+ <DIV ALIGN="CENTER">
+
+</DIV> <IMG
+  WIDTH="672" HEIGHT="262" ALIGN="BOTTOM" BORDER="0"
+ SRC="./registerCode.png"
+ ALT="Image registerCode">
+
+</DIV>
+
+<P>
+
+<P>
+Now while logging in, we first need to hash the password entered by the user before comparing it to the password hash stored in the database. We do this comparison using the matches(..) method of the BCryptPasswordEncoder class. Then if a match occurs, we give the user his or her generated token and he or she now has access as a user.  And this is done in the method below:
+
+<P>
+
+<DIV ALIGN="CENTER">
+ <DIV ALIGN="CENTER">
+
+</DIV> <IMG
+  WIDTH="560" HEIGHT="280" ALIGN="BOTTOM" BORDER="0"
+ SRC="./loginCode.png"
+ ALT="Image loginCode">
+
+</DIV>
+
+<P>
+And this is a screen-shot of the database table that holds the users' information. The passwords are hashed as they should be:
+
+<P>
+
+<DIV ALIGN="CENTER">
+ <DIV ALIGN="CENTER">
+
+</DIV> <IMG
+  WIDTH="691" HEIGHT="79" ALIGN="BOTTOM" BORDER="0"
+ SRC="./database.png"
+ ALT="Image database">
+
+</DIV>
+
+<P>
+
+<H2><A NAME="SECTION00043000000000000000">
+The Dilemma Concerning the Encryption of the Database</A>
+</H2>
+ At the beginning, I also wanted to keep the database encrypted at all times and wanted the plain data to surface only during transactions with the service and the user. But after further reading on the subject I decided against this since it would slow down the application from all the encryption and decryption procedures and since a secret key would need to be used all the time, it would make the key very vulnerable to being intercepted anyway. 
+
+<P>
+
+<H2><A NAME="SECTION00044000000000000000">
+Two Remaining Vulnerabilities and Suggestions for Improvement</A>
+</H2>
+ There's one small improvement that can be done but not yet implemented. The secret key for generating the token is currently a static value, so somehow intercepting a token for a user, especially from the client-side of the application, would now help us be able to authenticate as that user indefinitely. As a solution to this, the secret key for the token generation can be updated every 24 hours or so. This would make some users disconnect while using at the time of the update but would help keep the tokens fresh.
+
+ Another and perhaps more important vulnerability of the application is that the client and server interact on an unsecure connection. This means the URL queries sent to the server can be intercepted by a third party and valuable information can be gathered from the payloads. A solution to this is to connect and exhange information by using an SSL certificate. But since I don't currently have one at hand, I wasn't able to implement this.
+
+<P>
+
+<H1><A NAME="SECTION00050000000000000000">
+Conclusion</A>
+</H1>
+ To conclude, we have seen some useful approaches on how to improve the security of an application. Using an insecure one as an example, we were able to also go through how they are programatically implemented in the Spring framework. We have seen how to generate a token for each user for him or her to only have authorization to their own data and we have seen how we can make sensitive user information more secure by storing them as hashes in the database. We have also discussed some of the current vulnerabilities of the application and what strategies could be used to make improvements. All in all, the techniques implemented have definitely made the application a lot more secure than at the beginning. Though I imagine there are more vulnerabilities I have either missed or just don't know of since a lot of it is up to the creativity of the person attacking. I hope to fix the vulnerabilities mentioned in this paper and also make further improvements in the future as I learn more on this subject.
+
+<P>
+
+<H1><A NAME="SECTION00060000000000000000">
+Helpful Resources</A>
+</H1>
+
+<P>
+This web page was very helpful for the Spring Security implementations:
+<TT><A NAME="tex2html4"
+  HREF="https://octoperf.com/blog/2018/03/08/securing-rest-api-spring-security/">https://octoperf.com/blog/2018/03/08/securing-rest-api-spring-security/</A></TT>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		</div>
+	</center>
+
+
+</body>
+</html>

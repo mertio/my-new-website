@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Simpsons Character Scanner: Determining the Certain Times Characters Appear in a Simpsons Episode Using Image Recognition with Convolutional Neural Networks</title>
+	<meta charset="UTF-8">
+	
+	
+	<meta name="description" content="In this project the goal will be to use convolutional neural networks and deep learning to build an application that takes in a Simpsons episode and a character as input and returns in what parts of the episode the character appears as output. The use of this application will be making compilation videos of Simpsons characters a lot easier. Instead of scanning through hours of footage in the Simpsons archive to find the scenes of the character of interest, it will now be possible to just choose the character and get what time frame they appear in in the episode.">
+	
+	<link rel="stylesheet" type="text/css" href="../../MyStyles.css">
+	
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-132957653-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-132957653-1');
+</script>
+
+	
+	
+</head>
+<body>
+
+
+
+		<img src="../../mebubiLogo.png" align="left">
+
+			<br><br><br>
+		<ul id="navUL">
+			<div id="divToRight">
+			<li id="navLI"><a id="navLink" href="../../contact.html"><b>Contact</b></a></li>
+			</div>
+			<div id="divToRight">
+			<li id="navLI"><a id="navLink" href="../../blog.html"><b>Blog</b></a></li>	
+			</div>
+			<div id="divToRight">
+			<li id="navLI"><a id="navLink" href="../../projects.html"><b>Projects</b></a></li>
+			</div>
+			<div id="divToRight">
+			<li id="navLI"><a id="navLink" href="../../index.html"><b>About Me</b></a></li>
+			</div>
+
+
+		</ul>
+
+	<hr id="seperatingLine" align="center">
+
+
+	<br>
+
+	<center>
+		<div id="textBody" style="font-family: Arial; text-align: left;">
+			
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<P>
+
+
+<P>
+
+
+<P>
+<H1 ALIGN=CENTER>Determining the Certain Times Characters Appear in a Simpsons Episode Using Image Recognition with Convolutional Neural Networks
+<BR>
+</H1>
+<P ALIGN=CENTER><STRONG>Mert Bugra Bicak</STRONG><br>
+<SPAN  CLASS="textit">Department of Computer Engineering</SPAN>
+<BR><I><SPAN  CLASS="textit">Akdeniz University</SPAN></I>
+<BR><FONT SIZE=-1>Antalya, Turkey</FONT>
+</P>
+<HR>
+
+
+<P>
+
+<H3>Abstract</H3>
+<DIV CLASS="ABSTRACT">
+In this project the goal will be to use convolutional neural networks and deep learning to build an application that takes in a Simpsons episode and a character as input and returns in what parts of the episode the character appears as output. The use of this application will be making compilation videos of Simpsons characters a lot easier. Instead of scanning through hours of footage in the Simpsons archive to find the scenes of the character of interest, it will now be possible to just choose the character and get what time frame they appear in in the episode. 
+</DIV>
+<P>
+
+<P>
+
+<P>
+
+<H1><A NAME="SECTION00010000000000000000">
+Introduction</A>
+</H1>
+The application that I have developed for this project works by taking a directory of episodes and a specific character(1 of 18 selectable characters) as input, dividing up each episode video into individual image frames for every 3 seconds of the video and checking each of these images to see if that character is in it. If the prediction for the character in an image is both higher than the other possible 17 characters and also above 0.6, the images is accepted.  In the end it gives an output in a grid format that consists of the accepted image thumbnails, the time frame the character appeared, and the episode that the image occurs in. The user can observe the images and see when and what episode the desired character occurs in. It uses a 9 layer convolutional neural network trained up to 70% accuracy that takes in 64x64x3 image inputs and gives 18 outputs, each one signifying the probability of a character. This neural network was trained with a data-set of around 6000 images of 18 Simpsons characters. In this paper, we will observe the development of this application in detail.
+
+<P>
+
+<H1><A NAME="SECTION00020000000000000000">
+Implementation Details</A>
+</H1>
+Below are the tools and technologies that were used in the development of this project. 
+
+<P>
+
+<H2><A NAME="SECTION00021000000000000000">
+Programming Language and Framework</A>
+</H2>
+I have used the Java programming language and the "Deeplearning4j" framework to build the image classifier network and used JavaFX to build a basic, user friendly GUI for the application. As a starting basis for the deep learning task, I used an image classification example from the Deeplearning4j Github page[1] and built upon it. The loading of the training set and other small tasks were done with the help of this code. The first convolutional neural network featured (Model A) was heavily inspired by the LeNet model neural network. The other one (Model B), which was the one that worked the best and was used for the application, was built and configured by myself. 
+
+<P>
+
+<H2><A NAME="SECTION00022000000000000000">
+Data Set</A>
+</H2>
+As the data-set, I used "the Simpsons Characters Data" from the user alexattia in the website www.kaggle.com.[2] This dataset contains many hundreds of pictures each for more than 20 of the characters in the show to train and test the image classifier. Since some of the characters had too few images to get good enough training results, I decided to narrow the number of characters down to 18.
+
+<P>
+
+<H1><A NAME="SECTION00030000000000000000">
+Neural network Models Tried</A>
+</H1>
+For the the image classification task, I built 2 different convolutional neural network models. They differ in the number of convolutional layers and dense layers and got different results. Below are the basic descriptions for each neural network. e.g. how many layers, activation functions, learning rate, etc. and the filter sizes and stride counts can be observed in their respective diagrams.
+
+<H2><A NAME="SECTION00031000000000000000">
+Model A</A>
+</H2>
+This neural network has 6 layers. An input layer, 2 convolutional layers, 2 max pooling layers, a dense layer and the output layer. It uses the RELU function as the activation function in the middle layers and uses the softmax function in the last one. It has a learning rate of 0.001 and momentum of 0.9.
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="fig"><tex2html_anchor_mark></A><A NAME="30"><tex2html_anchor_mark></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 1:</STRONG>
+Diagram for neural network model A</CAPTION>
+<TR><TD><DIV CLASS="centerline" ID="par282" ALIGN="CENTER">
+<IMG
+  WIDTH="100" HEIGHT="436" ALIGN="BOTTOM" BORDER="0"
+ SRC="./modelADiagram.jpg"
+ ALT="Image modelADiagram"></DIV></TD></TR>
+</TABLE>
+</DIV>
+
+
+<P>
+
+<H2><A NAME="SECTION00032000000000000000">
+Model B</A>
+</H2>
+This neural network has 10 layers. 1 input layer, 3 convolutional layers, 3 max pooling layers, 2 dense layers and an output layer. The hidden layers of this network use the LEAKYRELU function and the function of the last layer is the softmax function. It has a learning rate of 0.01 and a momentum of 0.9. 
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="fig"><tex2html_anchor_mark></A><A NAME="36"><tex2html_anchor_mark></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 2:</STRONG>
+Diagram for neural network model B</CAPTION>
+<TR><TD><DIV CLASS="centerline" ID="par287" ALIGN="CENTER">
+<IMG
+  WIDTH="104" HEIGHT="644" ALIGN="BOTTOM" BORDER="0"
+ SRC="./modelBDiagram.jpg"
+ ALT="Image modelBDiagram"></DIV></TD></TR>
+</TABLE>
+</DIV>
+
+
+<P>
+
+<H1><A NAME="SECTION00040000000000000000">
+The Learning Period</A>
+</H1>
+
+<P>
+Before we move on to the training progress and results for each respective network, let us take a look at the common steps each network takes before and during the training procedure and what class in Deeplearning4j is used for each of them.
+
+<UL>
+<LI>Load all image data along with their labels using the FileSplit class.
+
+<P>
+</LI>
+<LI>Automatically improve data-set by making necessary eliminations using the BalancedPathFilter class. After doing this, approximately 6000 images were left in the data-set, around 5000 of them being for training and around 1000 being for testing.
+
+<P>
+</LI>
+<LI>Split the data-set into two, 80% of it being the training set and 20% of it being the test set using the InputSplit class.
+
+<P>
+</LI>
+<LI>Using the DataNormalization class, we normalize the images into a range of 0 to 1 for smoother learning.
+
+<P>
+</LI>
+<LI>Next we create a MultiLayerNetwork instance by either creating a new model (one of A or B in this case) or loading one from a file.
+
+<P>
+</LI>
+<LI>We use the RecordReader and DataSetIterator classes to fetch our training data and make it ready to be iterated through.
+
+<P>
+</LI>
+<LI>Then for a specific number of epochs(1 traversal through the whole data-set) we train the network using the network.fit(..) method. During training, we get the cost vs. iteration graph and the movement of the parameters across iterations as a UI in localhost:9000.
+
+<P>
+</LI>
+<LI>After training is done, we load the test set and get the necessary statistics from running the network on this set. Statistics that we will be observing further on in this paper.
+
+<P>
+</LI>
+<LI>And lastly, we save the network model as a bin file.
+
+<P>
+</LI>
+</UL>
+
+<P>
+
+<H2><A NAME="SECTION00041000000000000000">
+Training Procedure and Results for Model A</A>
+</H2>
+It was difficult to get good results with this model. The cost (as seen below) decreased very slowly compared to the number of iterations(1 epoch can be seen as about 170 iterations). Increasing the learning rate also didn't help at all with the accuracy and making further and further iterations until an eventual sweet spot, I was able to reach 56%.
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="fig"><tex2html_anchor_mark></A><A NAME="45"><tex2html_anchor_mark></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 3:</STRONG>
+Cost vs. Iteration graph for model A</CAPTION>
+<TR><TD><DIV CLASS="centerline" ID="par293" ALIGN="CENTER">
+<IMG
+  WIDTH="506" HEIGHT="139" ALIGN="BOTTOM" BORDER="0"
+ SRC="./previousModelCostGraph.png"
+ ALT="Image previousModelCostGraph"></DIV></TD></TR>
+</TABLE>
+</DIV>
+
+
+<P>
+Let's now look at the evaluation done by Deeplearning4j in a detailed manner, giving us the accuracy and other useful statistics:
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="fig"><tex2html_anchor_mark></A><A NAME="50"><tex2html_anchor_mark></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 4:</STRONG>
+Test statistics for model A</CAPTION>
+<TR><TD><DIV CLASS="centerline" ID="par297" ALIGN="CENTER">
+<IMG
+  WIDTH="431" HEIGHT="358" ALIGN="BOTTOM" BORDER="0"
+ SRC="./accuracyOfPreviousModel.png"
+ ALT="Image accuracyOfPreviousModel"></DIV></TD></TR>
+</TABLE>
+</DIV>
+
+
+<P>
+Figure 4 gives us the final statistics of predictions done on the test set. This was the best result I could get with this model with the accuracy, precision, recall, and F1 score being around 56%. The confusion matrix gives us how many of which labels were predicted as which labels. The diagonal indexes portray successful predictions and the more we accumulate on the diagonal line, the better our network gets. And we can also observed that the predictions are well balanced. There is no one sidedness whatsoever with the predictions.
+
+<P>
+
+<H2><A NAME="SECTION00042000000000000000">
+Training Procedure and Results for Model B</A>
+</H2>
+After achieving relatively low results with model A and getting a better grasp on the components of the network, I built a new one and got better results. The next figure below is the cost vs. iteration graph of this network after an overnight training session:
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="fig"><tex2html_anchor_mark></A><A NAME="56"><tex2html_anchor_mark></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 5:</STRONG>
+Cost vs. Iteration graph for model B</CAPTION>
+<TR><TD><DIV CLASS="centerline" ID="par302" ALIGN="CENTER">
+<IMG
+  WIDTH="505" HEIGHT="139" ALIGN="BOTTOM" BORDER="0"
+ SRC="./longTraining.png"
+ ALT="Image longTraining"></DIV></TD></TR>
+</TABLE>
+</DIV>
+
+
+<P>
+As we can see from this graph, it manages to converge to a much smaller cost and the curve of the graph resembles what would be normally expected in training a lot more than the previous model. Though since the training duration was very long, at the end it reiterated itself. But looking at this graph, I did another training run, this time with a more reasonable epoch number and tried to hit a sweet spot. Here is what I managed to obtain:
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="fig"><tex2html_anchor_mark></A><A NAME="61"><tex2html_anchor_mark></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 6:</STRONG>
+Cost vs. Iteration graph for model B</CAPTION>
+<TR><TD><DIV CLASS="centerline" ID="par306" ALIGN="CENTER">
+<IMG
+  WIDTH="506" HEIGHT="140" ALIGN="BOTTOM" BORDER="0"
+ SRC="./sweetspot.png"
+ ALT="Image sweetspot"></DIV></TD></TR>
+</TABLE>
+</DIV>
+
+
+<P>
+After stopping at about 1550 or so iterations, the cost dropped to about 0.25. After this training procedure, the accuracy I obtained had already surpassed model B. In the next figure, we can observe the accuracy and the confusion matrix after this training run.
+
+<P>
+
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="fig"><tex2html_anchor_mark></A><A NAME="66"><tex2html_anchor_mark></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 7:</STRONG>
+Test statistics for model B</CAPTION>
+<TR><TD><DIV CLASS="centerline" ID="par310" ALIGN="CENTER">
+<IMG
+  WIDTH="427" HEIGHT="350" ALIGN="BOTTOM" BORDER="0"
+ SRC="./penultimateAccuracy.png"
+ ALT="Image penultimateAccuracy"></DIV></TD></TR>
+</TABLE>
+</DIV>
+
+
+<P>
+As seen in figure 7, the accuracy obtained was close to 65%, 9% better than model B and the accumulation in the diagonal also increased when compared to B. For example, 63 hits for Grandpa Simpson in A compared to 32 in B. Even though the result was relatively better than, there seemed like there as still room for improvement. So I ran 20 to 30 more epochs on the model B network and approach an accuracy very close to 70%. After getting close to 70%, the accuracy of the model started increasing very slowly and due fear of overfitting, I decided to stop at this moment and use this network in my application since 70% seemed like it would be a decent rate for classifying 18 images. Here are the final results and test statistics for model B:
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="fig"><tex2html_anchor_mark></A><A NAME="71"><tex2html_anchor_mark></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 8:</STRONG>
+Test statistics for model B</CAPTION>
+<TR><TD><DIV CLASS="centerline" ID="par314" ALIGN="CENTER">
+<IMG
+  WIDTH="430" HEIGHT="352" ALIGN="BOTTOM" BORDER="0"
+ SRC="./lastAccuracy.png"
+ ALT="Image lastAccuracy"></DIV></TD></TR>
+</TABLE>
+</DIV>
+
+
+<P>
+Again we notice the improvements compared to the previous run. What I've also noticed is that when looking at the confusion matrix, we can see that Bart and Lisa get mixed up a lot. This might be because they regularly appear together in the show, or simply because they look very similar. They are siblings after all. This might also account for some of the loss in accuracy.
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="fig"><tex2html_anchor_mark></A><A NAME="76"><tex2html_anchor_mark></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 9:</STRONG>
+Bart and Lisa look very similar</CAPTION>
+<TR><TD><DIV CLASS="centerline" ID="par318" ALIGN="CENTER">
+<IMG
+  WIDTH="223" HEIGHT="168" ALIGN="BOTTOM" BORDER="0"
+ SRC="./bartAndLisa.jpg"
+ ALT="Image bartAndLisa"></DIV></TD></TR>
+</TABLE>
+</DIV>
+
+
+<P>
+
+<H1><A NAME="SECTION00050000000000000000">
+The Application</A>
+</H1>
+Now let's move on to the application itself. After getting a decent hit rate in model B, I developed a nice developed a small, user-friendly application that takes in a directory (of the episodes we want to scan) and a character selection from a drop-down menu as input. Then, the application takes a frame of every 3 seconds from each episode and puts them through the convolutional neural network. It the network predicts the character we are searching for and the prediction value is more than 60%, we accept this image and save it along with the time frame it occurs in and in which episode. I found 60% to be the best threshold since if it were to be higher, even though the images would have a higher chance of actually having the character, there's a chance it would skip a lot of the images where the character appears due to the high threshold. And if it were to be lower, we might get too many images that don't have the character. Finally after going  through all the episodes, we show the images we accepted as thumbnails of the images coupled with the necessary information. Now let's take a look at a sample run of the application:
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="fig"><tex2html_anchor_mark></A><A NAME="82"><tex2html_anchor_mark></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 10:</STRONG>
+Select character and episode directory</CAPTION>
+<TR><TD><DIV CLASS="centerline" ID="par323" ALIGN="CENTER">
+<IMG
+  WIDTH="516" HEIGHT="123" ALIGN="BOTTOM" BORDER="0"
+ SRC="./margeSelect.png"
+ ALT="Image margeSelect"></DIV></TD></TR>
+</TABLE>
+</DIV>
+
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="fig"><tex2html_anchor_mark></A><A NAME="87"><tex2html_anchor_mark></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 11:</STRONG>
+The loading screen while scanning episodes</CAPTION>
+<TR><TD><DIV CLASS="centerline" ID="par327" ALIGN="CENTER">
+<IMG
+  WIDTH="498" HEIGHT="60" ALIGN="BOTTOM" BORDER="0"
+ SRC="./load.png"
+ ALT="Image load"></DIV></TD></TR>
+</TABLE>
+</DIV>
+
+
+<P>
+
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="fig"><tex2html_anchor_mark></A><A NAME="92"><tex2html_anchor_mark></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure 12:</STRONG>
+Results after scanning for Marge Simpson</CAPTION>
+<TR><TD><DIV CLASS="centerline" ID="par331" ALIGN="CENTER">
+<IMG
+  WIDTH="513" HEIGHT="288" ALIGN="BOTTOM" BORDER="0"
+ SRC="./margeResults.png"
+ ALT="Image margeResults"></DIV></TD></TR>
+</TABLE>
+</DIV>
+
+
+<P>
+In figure 12, we can observe the resulting images along with their time frame and what video they belong to. In this sample run, we searched for Marge Simpson in 3 random Simpsons episodes and got very good results. As seen, only 2 of the first 16 images don't have Marge Simpson in it.
+
+<P>
+
+<H1><A NAME="SECTION00060000000000000000">
+Conclusion</A>
+</H1>
+In this paper, we have observed the development process of an application that uses a convolutional neural network to classify images. While doing this, we have seen and compared the structure and performances of two different convolutional neural networks. We have examined the process of learning step by step. We have analyzed cost vs. iteration graphs of these networks along with their statistics on their test sets and took action or made assessments accordingly to get a better accuracy. Lastly we have observed a sample run of the application and saw how it worked. This application was developed for users to be able to quickly get scenes where a character appears while making compilation videos instead of searching through video after video by hand and it seems to give a pretty decent performance. Although there is definitely room for improvement. Maybe with more data or a better network model, a better accuracy could be achieved but due to hardware limitations and the training taking a very long time, a smaller accuracy had to do for now. And the user interface can definitely be better than it is. In the end, we have seen how convolutional neural networks are trained and used for image classification with a practical example.
+
+<P>
+ 
+<H2><A NAME="SECTION00070000000000000000">
+References</A>
+</H2>
+[1] “AnimalsClassification.java.”, Rahul Raj, June 7 2018, deeplearning4j
+- https://github.com/deeplearning4j/dl4j-examples/blob/master/dl4j- examples/src/main/java/org/deeplearning4j/examples/convolution/AnimalsClassification.java
+<BR>
+[2] The Simpsons Characters Data, Alexattia, www.kaggle.com/alexattia/the-simpsons-characters-dataset
+<BR>
+<br><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		</div>
+	</center>
+
+
+</body>
+</html>

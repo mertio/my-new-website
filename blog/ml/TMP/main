@@ -1,0 +1,188 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage{comment} 
+\usepackage{lipsum} 
+\usepackage{fullpage} 
+\usepackage[utf8]{inputenc} 
+\usepackage{hyperref} 
+\usepackage{graphicx}
+
+
+\begin{document}
+%Header-Make sure you update this information!!!!
+\noindent
+\large\textbf{Homework Report} \hfill \textbf{Mert Buğra Bıçak} \\
+\normalsize CSE 463 \hfill 20160808002 \\
+Neural Networks \hfill Due Date: 17/12/18
+
+\section*{Implementation Details}
+\hspace*{10mm}For this task, I used pure Java and built a neural network that takes in a number of inputs(features used), number of hidden layers(can only take 1 or 2), number of units each hidden layer will possess, and the number of outputs. As the cost function, I have used the cross enthropy function as the loss function since it is the one that is most commonly used and we have observed it more carefully in class. As for the activation function, the sigmoid function was used in each layer. \newline
+\hspace*{10mm}I have not used any libraries in this project. I have written a small file consisting of the functions I have used to implement the network called MertsFunctions, such as matrix multiplication, addition, weight saving/loading, etc. Some small helper functions like for example loading the digit data from the file, were referenced from StackOverflow and the users that provided the code, either as a basis or as a whole function, have been referenced in the source code of the homework.
+
+\section*{Part 1: Building a Neural Network with 1 Hidden Layer to Help Classify Thyroids}
+
+\hspace*{10mm}For this problem I used the training set (“ann-train.data”) and the test set (“ann-test.data”) given.  The training set contains 3772 instances and the test set contains 3428 instances. There are a total of 3 classes. Each of the instances in these sets have 21 features, 15 of them binary and 6 of them continuous and 1 class label that consists of 3 possible values: 1,2, or 3. \newline
+\hspace*{10mm}I chose to include all 21 features but since some are continuous and some are binary, I used max-min normalization to normalize each input into a value in the range of -1 and 1.
+\subsubsection*{The Class Distribution Problem}
+\hspace*{10mm}The one big problem I ran into is the imbalance in the class distribution in both the training set and the testing set. Approximately 92\% of each set consists of instances belonging to class 3. This completely biased the neural network towards class 3, resulting in it predicting class 3 for every instance no matter what the learning rate, number of hidden nodes, etc. was.
+\subsubsection*{Tackling the Class Distribution Problem}
+\hspace*{10mm}As a possible solution to this imbalance, I have used up-sampling, e.g. increased the number of each minority class by duplicating them a number of times. While balancing the inputs, I added each instance of class 1 for 4 times (372 instances of class 1 in total) and each instance of class 2 twice (382 instances of class 2 in total). I added the remaining instances from class 3 with the number of instances being close to the number of the instances of class 1 and 2 (394 instances of class 3 in total) and then shuffled them up. Also for every time the set is loaded, the input is shuffled as well. This helps each iteration be trained with different random instances of class 3 as opposed to down-sampling class 3 the first 387 instances.
+
+\subsection*{Training and Tesing with Different Numbers of Hidden Layer Nodes}
+\hspace*{10mm}For each training, to tackle of the class distribution problem, I kept the epoch at 1 and reloaded the data for each iteration to freshen up the training data to include other instances of class 3 as mentioned in the previous section. As a reminder, every training session has been done with the balanced training set since the unbalance one is pretty much useless. I did 5000 iterations (converges to a nice number) for each number and used the learning rate of 0.01 as I found it to be the best through experience. Here are the results obtained from the training of 5 different numbers of hidden layer nodes: (N: Number of hidden layer nodes, $\alpha$: Learning rate) \newline
+
+
+
+\begin{table}[h]
+\begin{tabular}{|l|l|l|l|l|l|l|l|}
+\hline
+N=20, $\alpha$=0.01  &    C1 acc. & C2 acc. & C3 acc. & Gen. Acc. & C1 inst. & C2 inst. & C3 inst. \\ \hline
+Balanced Train Set   &        92.47\%   &    54.18\%     &    67.95\%     &    71.34\%       &       372   &     382     &     394          \\ \hline
+Unbalanced Train Set &        92.47\%    &     54.45\%    &       68.83\%  &     68.67\%      &       93   &     191     &      3488     \\ \hline
+Test Set             &      97.26\%      &       6.77\%  &       35.84\%  &       35.63\%    &     73     &      177    &       3178        \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\begin{tabular}{|l|l|l|l|l|l|l|l|}
+\hline
+N=50, $\alpha$=0.01  &    C1 acc. & C2 acc. & C3 acc. & Gen. Acc. & C1 inst. & C2 inst. & C3 inst. \\ \hline
+Balanced Train Set   &     90.32\%   &    58.90\%     &    74.87\%     &    74.56\%       &       372   &     382     &     394          \\ \hline
+Unbalanced Train Set &        90.32\%    &     59.16\%    &       75.34\%  &     74.87\%      &       93   &     191     &      3488     \\ \hline
+Test Set             &      98.63\%      &       37.28\%  &       21.86\%  &       24.29\%    &     73     &      177    &       3178        \\ \hline
+\end{tabular}
+\end{table}
+
+
+\begin{table}[h]
+\begin{tabular}{|l|l|l|l|l|l|l|l|}
+\hline
+N=100, $\alpha$=0.01  &    C1 acc. & C2 acc. & C3 acc. & Gen. Acc. & C1 inst. & C2 inst. & C3 inst. \\ \hline
+Balanced Train Set   &        94.62\%   &    54.97\%     &    74.60\%     &    73.21\%       &       372   &     382     &     394          \\ \hline
+Unbalanced Train Set &        94.62\%    &     54.97\%    &       72.36\%  &     72.01\%      &       93   &     191     &      3488     \\ \hline
+Test Set             &      100\%      &       5.64\%  &       80.39\%  &       76.93\%    &     73     &      177    &       3178        \\ \hline
+\end{tabular}
+\end{table}
+
+\newpage
+
+
+\begin{table}[h]
+\begin{tabular}{|l|l|l|l|l|l|l|l|}
+\hline
+N=200, $\alpha$=0.01  &    C1 acc. & C2 acc. & C3 acc. & Gen. Acc. & C1 inst. & C2 inst. & C3 inst. \\ \hline
+Balanced Train Set   &    96.50\%   &    60.20\%     &    74.16\%     &    76.77\%       &       372   &     382     &     394          \\ \hline
+Unbalanced Train Set &        96.77\%    &     60.20\%    &       74.94\%  &     74.71\%      &       93   &     191     &      3488     \\ \hline
+Test Set             &      72.60\%      &       44.63\%  &       77.34\%  &       75.53\%    &     73     &      177    &       3178        \\ \hline
+\end{tabular}
+\end{table}
+
+
+
+
+\begin{table}[h]
+\begin{tabular}{|l|l|l|l|l|l|l|l|}
+\hline
+N=400, $\alpha$=0.01  &    C1 acc. & C2 acc. & C3 acc. & Gen. Acc. & C1 inst. & C2 inst. & C3 inst. \\ \hline
+Balanced Train Set   &        95.69\%   &    63.08\%     &    77.49\%     &    78.60\%       &       372   &     382     &     394          \\ \hline
+Unbalanced Train Set &        95.69\%    &     63.35\%    &       76.00\%  &     75.82\%      &       93   &     191     &      3488     \\ \hline
+Test Set             &      72.60\%      &       99.43\%  &       9.21\%  &       15.22\%    &     73     &      177    &       3178        \\ \hline
+\end{tabular}
+\end{table}
+
+
+
+
+
+
+\hspace*{10mm}The numbers I got from these trials are very interesting. The learning goes relatively well for the balanced training set and the unbalanced training set for every one of them. This is expected since it is tested on the data that it is trained with. The more interesting observations can be made on the accuracies of the test set. Depending on the numbers of hidden layer nodes(N), it is never the same two classes that get the highest class based accuracy. For example in N=50 and N=400, class 1 and 2 do better than 3. But when we look at N=200, we see what class 1 and 3 surpass 2. So we really can't say that one class dominates the others. Though it seems that the increased accuracy of two classes usually come at the cost of one. When we look at the higher percentages obtained, we can see that accuracy in C1 and C3 comes at the expense of the accuracy of C2 in N=100, and the accuracy of C1 and C2 comes at the expense of C3 in N=400. The more balanced set I obtained comes from N=200, which I will go forward with in further experimentation.
+
+\newpage
+
+\subsection*{Normalized vs. Non-normalized}
+\hspace*{10mm}With the same settings of the N=200 table in the previous section, I went through the exact same procedure this time without normalizing the data. Here are the 2 tables for us to compare: \newline\newline
+\hspace*{5mm}Normalized inputs:
+\begin{table}[h]
+\begin{tabular}{|l|l|l|l|l|l|l|l|}
+\hline
+N=200, $\alpha$=0.01  &    C1 acc. & C2 acc. & C3 acc. & Gen. Acc. & C1 inst. & C2 inst. & C3 inst. \\ \hline
+Balanced Train Set   &    96.50\%   &    60.20\%     &    74.16\%     &    76.77\%       &       372   &     382     &     394          \\ \hline
+Unbalanced Train Set &        96.77\%    &     60.20\%    &       74.94\%  &     74.71\%      &       93   &     191     &      3488     \\ \hline
+Test Set             &      72.60\%      &       44.63\%  &       77.34\%  &       75.53\%    &     73     &      177    &       3178        \\ \hline
+\end{tabular}
+\end{table}
+
+Non-normalized inputs:
+\begin{table}[h]
+\begin{tabular}{|l|l|l|l|l|l|l|l|}
+\hline
+N=200, $\alpha$=0.01  &    C1 acc. & C2 acc. & C3 acc. & Gen. Acc. & C1 inst. & C2 inst. & C3 inst. \\ \hline
+Balanced Train Set   &    78.49\%   &    57.85\%     &    72.40\%     &    69.53\%       &       372   &     382     &     394          \\ \hline
+Unbalanced Train Set &        78.48\%    &     58.11\%    &       74.25\%  &     73.52\%      &       93   &     191     &      3488     \\ \hline
+Test Set             &      67.12\%      &       57.62\%  &       74.88\%  &       73.81\%    &     73     &      177    &       3178        \\ \hline
+\end{tabular}
+\end{table}
+
+\hspace*{10mm}When we compare the two results, we can see that in the balanced and unbalanced training set results, the class based accuracy in general took a hit and came out lower than the normalized version. Especially class 1, which went from around 96\% to 78\%. When it comes to the actual test set, we observe the almost the same situation with the only difference with class 2 increasing from 44\% to 57\%. Since we already observed, for 2 classes to grow in accuracy meant the decrease of the accuracy of the other class. We can see it occur here in reverse order. With the accuracy of classes 1 and 3 room opens for class 2 and it gets to increase its accuracy. \newline
+\hspace*{10mm}It must be said that since the inputs were all in the range of 0 and 1 to begin with, normalizing the inputs to the range of -1 to 1 did not make  an incredibly significant difference concerning the accuracy. So the results in the tables came out as expected. Since sigmoid functions were used for each layer, the overall increase of accuracy possibly came from converting the range of the input in to the exact range of input the sigmoid function has, which is from -1 to 1.
+
+\newpage
+
+\section*{Part 2: Building a Neural Network with 2 Hidden Layers to Help Classify Hand-written Digits}
+\hspace*{10mm}For this problem, my network takes in 784 inputs(number of pixels for each 28x28 image) and gives 10 outputs, each output being a vector of digit.(e.g. 1 = [0,1,0,0,0,0,0,0,0,0]) I have done training with 3 different styles and obtained varying results.
+\subsection*{Style 1:}
+\hspace*{10mm}The first style has 100 nodes for each hidden layer and has a high batch account with a low batch size, with the epoch number(number of times the back-propagation algorithm runs on a specific batch) of 50. A total of 55000 images were used to train this neural network. Below are some graphs. \newline
+
+
+\begin{center}
+\includegraphics[scale=0.37]{highBatchLoss.png}
+\end{center}
+\begin{center}
+\includegraphics[scale=0.38]{highBatchAccuracy.png}
+\end{center}
+\newline
+
+\newpage
+\hspace*{10mm}The graphs show us the loss and the accuracy of each individual batch so the fluctuations shouldn't be miss-leading. Each batch consists of 500 seperate images and each training session gives a slightly different loss compared to the last one but nevertheless it slowly converges to a range between 0.3 and 0.6. The same can be said for accuracy. The accuracy on the graph is the accuracy for each individual batch and slowly converges to a range of 92 to 96\%. This network scores 78.86\% accuracy on 5000 test images. This was expected since the 92-96\% range was achieved through testing with its own training data. 
+\subsection*{Style 2:}
+\hspace*{10mm}Next style I did involved involved 55 batches with each batch size being 1000, and the epoch being 150 for each batch. This time I used 200 nodes in the hidden layers and after a relatively longer training period from a test set of 5000 images, the same set as the first one, it managed to give 82.38\% in accuracy. Almost 5\% better than the first style. The learning path was very similar to the first and increasing the number of hidden nodes was probably helpful in the 5\% increase in accuracy. Here are the graphs for the loss and accuracy of each batch. We can see the same fluctuations since the cost and accuracy is a bit different for each batch. But they still manage to converge to a nice number.
+
+\begin{center}
+\includegraphics[scale=0.37]{lastLoss.png}
+\end{center}
+
+Here is an example of a prediction made by the algorithm: \newline\newline
+Test number: 82, Prediction: 2.0, Reality: 2.0 \newline
+[7.55E-5, 6.75E-5, 0.99, 3.20E-4, 2.95E-6, 7.15E-4, 5.61E-4, 5.80E-4, 5.21E-5, 1.30E-6] \newline
+The number on the third index is extremely high compared to the others, so the the algorithm predicts 2. (the first index is zero)
+
+
+
+
+
+\begin{center}
+\includegraphics[scale=0.38]{lastAccuracy.png}
+\end{center}
+\newline
+
+\subsection*{Style 3:}
+\hspace*{10mm}As the third style, I decided to try a larger batch size and a lower number of epochs for comparison to the second run. The results weren't as good as the others. The reason was probably due to a low number of epochs. Each batch still individually converged in loss to a certain extent but the loss never dropped to the same amount as the first two and in the end it gave an accuracy of 67.83\% on the test set with 5000 images.
+\subsection*{Conclusion}
+\hspace*{10mm}Below is a table that shows the details of each style for a better analysis. The best result was obtained by style 2, both because of the higher number of hidden nodes helping the algorithm find a better fitting curve for the data. The 5\% lower accuracy from Style 1 seems like there wasn't enough hidden nodes compared to style 2 and the resulting curve couldn't be as complex as needed. Finally Style 3 suffered from the low number of epochs needed for each batch, it couldn't learn enough of each batch and moved on to the new one too early and resulted in a much lower accuracy than the others. 
+
+
+
+\begin{table}[h]
+\begin{tabular}{|l|l|l|l|l|l|l|}
+\hline
+$\alpha$=0.01 & Num. of hidden nodes & epochs & Batch size & Batch num. & Overall data & Accuracy \\ \hline
+Style 1      & 100                  & 100    & 500        & 110        & 55000        & 78.86\%  \\ \hline
+Style 2      & 200                  & 150    & 1000       & 55         & 55000        & 82.38\%      \\ \hline
+Style 3      & 200                  & 50     & 5000      & 11          & 55000        & 67.83\%     \\ \hline
+\end{tabular}
+\end{table}
+
+
+
+
+
+\end{document}
